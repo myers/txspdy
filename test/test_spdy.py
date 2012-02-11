@@ -29,7 +29,5 @@ class SpdyProtocolTest(TestCase):
         self.proto.requestFactory = request
         self.send(example_frames)
         self.assertEqual(1, len(called))
-        #self.assertTrue(False)
-        # FIXME: ASSERT SOMETHING
         
                 
