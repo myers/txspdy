@@ -21,7 +21,14 @@ class SpdyProtocolTest(TestCase):
         self.proto.dataReceived(data)    
 
     def testExampleFrames(self):
+        called = []
+        def request(streamId, headers):
+            called.append(None)
+            self.assertEqual(1, streamId)
+            self.assertEqual('GET', headers.getRawHeaders('method')[0])
+        self.proto.requestFactory = request
         self.send(example_frames)
+        self.assertEqual(1, len(called))
         #self.assertTrue(False)
         # FIXME: ASSERT SOMETHING
         

@@ -28,6 +28,7 @@ STREAM_MASK = 0x7fffffff
 class SpdyProtocol(stateful.StatefulProtocol):
     def __init__(self):
         self.streams = {}
+        self.requestFactory = SpdyRequest
 
     def getInitialState(self):
         return self.parseFrameHeader, 8
@@ -58,7 +59,7 @@ class SpdyProtocol(stateful.StatefulProtocol):
             associatedStreamId = struct.unpack("!I", data[4:8])[0]
             tuplePos += 4
         headers = SpdyHeaders(data=data[tuplePos:])
-        request = SpdyRequest(streamId, headers)
+        request = self.requestFactory(streamId, headers)
         self.streams[streamId] = request
         #self.streams[streamId].process()
         # FIXME: expose pri
