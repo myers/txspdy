@@ -2,29 +2,16 @@ from twisted.trial.unittest import TestCase
 from twisted.test import proto_helpers
 from twisted.internet.protocol import ClientFactory
 
-from .. import spdy_headers
+from .. import spdy_headers, c_zlib
 
-import copy
 example_headers = "8\xea\xdf\xa2Q\xb2b\xe0f`\x83\xa4\x17\x06{\xb8\x0bu0,\xd6\xae@\x17\xcd\xcd\xb1.\xb45\xd0\xb3\xd4\xd1\xd2\xd7\x02\xb3,\x18\xf8Ps,\x83\x9cg\xb0?\xd4=:`\x07\x81\xd5\x99\xeb@\xd4\x1b3\xf0\xa3\xe5i\x06A\x90\x8bu\xa0N\xd6)NI\xce\x80\xab\x81%\x03\x06\xbe\xd4<\xdd\xd0`\x9d\xd4<\xa8\xa5\xbc(\x89\x8d\x81\x13\x1a$\xb6\x06\x0c,\xa0\xdc\xcf \x95\x9b\x9a\x92\x99\x98\x04LvyUz\xb9\x89\xc5\xd9\x99z\xf9E\xe9V\x96\x06\x06\x06\x0cl\xb9\xc0\x12(?\x85\x81\xd9\xdd5\x84\x81\xad\x18hNn*\x03kFI\t@\x05\xc5\x0c\xcc\xa0\xd0a\xd4g\xe0Bdi\x862\xdf\xfc\xaa\xcc\x9c\x9cD}S=\x03\x05\r\xdf\xc4\xe4\xcc\xbc\x92\xfc\xe2\x0ck\x05O`*\xcbQ\x00\n(\xf8\x07+D(\x18\x1a\xc4\x9b\xc5[h*8\x02\x03,5<5\xc9;\xb3D\xdf\xd4\xd8T\xcf\xd0PA\xc3\xdb#\xc4\xd7GG!'3;U\xc1=59;_S\xc19\x03XT\xa5\xea\x1b\x9a\xeb\x01\xc3\xd3\xccX\xcf\xc4L!81-\xb1(\x13\xaa\x89\x81\x1d\x1aa\x0c\x1c\xb0x\x04\x00\x00\x00\xff\xff"
 
 class SpdyHeaderTest(TestCase):
-    def setUp(self):
-        pass 
-        
-    def tearDown(self):
-        pass    
-
     def testSampleHeaders(self):
-        e = copy.copy(example_headers)
         headers = spdy_headers.SpdyHeaders(example_headers)
-        assert e == example_headers
         self.assertEqual(['en-US,en;q=0.8'], headers.getRawHeaders('accept-language'))
-
-    def testCompressRoundTrip(self):
-        hdrs = spdy_headers.SpdyHeaders('')
-        self.assertEqual('accept', hdrs._decompress(hdrs._compress('accept')))
 
     def testRoundTrip(self):
         headers = spdy_headers.SpdyHeaders(example_headers)
-        decompressedHeaders = headers._decompress(example_headers)
+        decompressedHeaders = c_zlib.decompress(example_headers, dictionary=spdy_headers.dictionary)
         self.assertEqual(decompressedHeaders, headers.asBinary(compressed=False))

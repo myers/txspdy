@@ -2,7 +2,7 @@ import struct
 
 from twisted.web import http_headers
 
-import c_zlib
+from c_zlib import compress, decompress
 
 dictionary = \
 "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-" \
@@ -39,21 +39,13 @@ class SpdyHeaders(http_headers.Headers):
             args.extend([len(n), n, len(v), v])
         hdrs = struct.pack("".join(fmt), *args)
         if compressed:
-            return self._compress(hdrs)
+            return compress(hdrs, dictionary=dictionary)
         return hdrs
         
-    def _compress(self, data):
-        compress = c_zlib.Compressor(dictionary=dictionary)
-        return compress(data)
-
-    def _decompress(self, data):
-        decompress = c_zlib.Decompressor(dictionary=dictionary)
-        return decompress(data)
-            
     def _parseHeaders(self, data):
         "Given a control frame data block, return a list of (name, value) tuples."
         # TODO: separate null-delimited into separate instances
-        data = self._decompress(data) # FIXME: catch errors
+        data = decompress(data, dictionary=dictionary) # FIXME: catch errors
         cursor = 2
         (num_hdrs,) = struct.unpack("!h", data[:cursor]) # FIXME: catch errors
         hdrs = []

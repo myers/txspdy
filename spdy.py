@@ -60,7 +60,7 @@ class SpdyProtocol(stateful.StatefulProtocol):
         headers = SpdyHeaders(data=data[tuplePos:])
         request = SpdyRequest(streamId, headers)
         self.streams[streamId] = request
-        self.streams[streamId].process()
+        #self.streams[streamId].process()
         # FIXME: expose pri
         #self._input_start(stream_id, hdr_tuples)
     

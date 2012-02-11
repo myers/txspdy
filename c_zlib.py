@@ -10,6 +10,7 @@ in the zlib module).
 
 __license__ = """
 Copyright (c) 2009 Mark Nottingham <mnot@pobox.com>
+Copyright (c) 2012 Myers Carpenter <myers@maski.org>
  
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,6 +70,18 @@ Z_SYNC_FLUSH = 0x02
 Z_FINISH = 0x04
 
 CHUNK = 1024 * 128  # FIXME: need to be smarter than this.
+
+__all__ = ['compress', 'decompress']
+
+# FIXME: be a drop in replacement for the standard python zlib module
+
+def compress(string, level=-1, dictionary=None):
+    cmp = Compressor(level, dictionary)
+    return cmp(string)
+
+def decompress(string, dictionary=None):
+    dcmp = Decompressor(dictionary)
+    return dcmp(string)
 
 class Compressor:
     def __init__(self, level=-1, dictionary=None):
